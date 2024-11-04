@@ -1,4 +1,4 @@
-# Fleet-Admin-Dashboard
+# Fleet Admin Dashboard
 
 Project Topic:
 FleetRewards: Loyalty Program Web Portal for Vehicular Networks Inc.
