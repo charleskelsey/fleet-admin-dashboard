@@ -10,8 +10,12 @@ The project is divided into seven sub-projects. Each group will be responsible f
 Key Features and Sub-Project Breakdown:
 1. Client Registration & Authentication System
 Team: User Access Management
+
 Key Features:
-User Registration: Enables fleet operators to register their companies, set up profiles, and verify accounts via email.
+
+User Registration: 
+
+Enables fleet operators to register their companies, set up profiles, and verify accounts via email.
 Secure Login & Authentication: Provides role-based login access (fleet managers, drivers, and admins) with password encryption and recovery options.
 Account Role Management: Ensures users have access to specific features based on their roles within the company.
 Integration:
