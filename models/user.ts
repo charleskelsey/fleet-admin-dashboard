@@ -1,17 +1,35 @@
 import mongoose, { Schema } from 'mongoose';
 
-enum Role {
-  User,
-  Admin
+export enum Role {
+  ADMIN = 'admin',
+  USER = 'user'
 }
 
 const userSchema = new Schema(
   {
-    id: String,
-    username: String,
-    password: String,
-    email: String,
-    role: Role
+    username: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String,
+      match: [/[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,}/, 'Please enter a valid email address'],
+      unique: true,
+      required: true
+    },
+    role: {
+      type: String,
+      enum: Role,
+      default: Role.USER
+    }
+  },
+  {
+    timestamps: true
   }
 );
 
