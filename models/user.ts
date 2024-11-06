@@ -1,9 +1,17 @@
 import mongoose, { Schema } from 'mongoose';
 
+enum Role {
+  User,
+  Admin
+}
+
 const userSchema = new Schema(
   {
-    name: String,
-    role: String
+    id: String,
+    username: String,
+    password: String,
+    email: String,
+    role: Role
   }
 );
 
