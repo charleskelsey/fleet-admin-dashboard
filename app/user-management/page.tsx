@@ -1,8 +1,19 @@
 'use client'
+import Link from 'next/link';
 import React, { use, useEffect, useState } from 'react'
 
 const userManagement = () => {
-    const [users, setUsers] = useState([]);
+    interface User {
+        _id: string;
+        username: string;
+        password: string;
+        email: string;
+        role: string;
+        createdAt: string;
+        updatedAt: string;
+    }
+    
+    const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
@@ -31,7 +42,7 @@ const userManagement = () => {
         return <p>Error: {error}</p>;
     }
 
-    const handleDelete = async (id) => {
+    const handleDelete = async (id: string) => {
         try {
             const res = await fetch(`/api/users?id=${id}`, {
                 method: 'DELETE',
@@ -40,23 +51,28 @@ const userManagement = () => {
                 throw new Error('Failed to delete user');
             }
             setUsers(users.filter((user) => user._id !== id));
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message);
         }
     };
 
-    const handleUpdate = (id) => {
-        // Placeholder for update functionality
-        console.log(`Update user with ID: ${id}`);
+    const handleRoleChange = async (id, newRole) => {
+        try {
+            const res = await fetch(`/api/users?id=${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ role: newRole }),
+            });
+            if (!res.ok) {
+                throw new Error('Failed to update user role');
+            }
+            setUsers(users.map((user) => (user._id === id ? { ...user, role: newRole } : user)));
+        } catch (err) {
+            setError(err.message);
+        }
     };
-
-    if (loading) {
-        return <p>Loading...</p>;
-    }
-
-    if (error) {
-        return <p>Error: {error}</p>;
-    }
     return (
 
         <div className="h-screen flex items-center justify-center">
@@ -91,13 +107,19 @@ const userManagement = () => {
                                         <td className="py-2 px-4 border-b">{user.role}</td>
                                         <td className="py-2 px-4 border-b">{new Date(user.createdAt).toLocaleString()}</td>
                                         <td className="py-2 px-4 border-b">{new Date(user.updatedAt).toLocaleString()}</td>
-                                        <td className="py-2 px-4 border-b text-left">
+                                        <td className="py-2 px-4 border-b text-left flex flex-col">
                                             <button
+                                                className=" text-blue-500 hover:underline "
+                                                onClick={() => handleRoleChange(user._id, user.role === 'admin' ? 'user' : 'admin')}
+                                            >
+                                                {user.role === 'admin' ? 'Make User' : 'Make Admin'}
+                                            </button>
+                                            {/* <button
                                                 className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
                                                 onClick={() => handleUpdate(user._id)}
                                             >
                                                 Update
-                                            </button>
+                                            </button> */}
                                             <button
                                                 className="bg-red-500 text-white px-2 py-1 rounded"
                                                 onClick={() => handleDelete(user._id)}
