@@ -15,7 +15,7 @@ const userManagement = () => {
     
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -56,7 +56,7 @@ const userManagement = () => {
         }
     };
 
-    const handleRoleChange = async (id, newRole) => {
+    const handleRoleChange = async (id: string, newRole: string) => {
         try {
             const res = await fetch(`/api/users?id=${id}`, {
                 method: 'PUT',
@@ -68,16 +68,18 @@ const userManagement = () => {
             if (!res.ok) {
                 throw new Error('Failed to update user role');
             }
+            const updatedUser = await res.json();
             setUsers(users.map((user) => (user._id === id ? { ...user, role: newRole } : user)));
         } catch (err) {
-            setError(err.message);
+            const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+            setError(errorMessage);
         }
     };
     return (
 
         <div className="h-screen flex items-center justify-center">
-            <main className="flex flex-col gap-6 w-full h-full pt-40 pb-4 px-12 border border-black">
-                <h1 className="font-extrabold text-8xl flex text-left">
+            <main className="flex flex-col gap-6 w-full h-full pt-10 pb-10 px-12 border border-black">
+                <h1 className="font-bold text-4xl flex justify-center">
                     USER MANAGEMENT
                 </h1>
                 <div className="h-full w-full border border-cyan-400 p-4">
@@ -121,7 +123,7 @@ const userManagement = () => {
                                                 Update
                                             </button> */}
                                             <button
-                                                className="bg-red-500 text-white px-2 py-1 rounded"
+                                                className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700"
                                                 onClick={() => handleDelete(user._id)}
                                             >
                                                 Delete
