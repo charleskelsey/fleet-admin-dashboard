@@ -1,6 +1,7 @@
 import connectMongoDB from "@/lib/mongodb";
 import User from "@/models/user";
 import { NextResponse, NextRequest } from 'next/server';
+import React, { useEffect, useState } from 'react';
 
 interface UserUpdate {
   newUsername: string;
@@ -202,5 +203,27 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: "User Deleted" }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ message: error }, { status: 400 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  const id = request.nextUrl.searchParams.get("id");
+  const { role } = await request.json();
+
+  try {
+    await connectMongoDB();
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "User role updated", user: updatedUser }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ message: "Failed to update user role", error }, { status: 400 });
   }
 }
