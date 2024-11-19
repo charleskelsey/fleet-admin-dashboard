@@ -65,7 +65,7 @@ import { NextResponse, NextRequest } from 'next/server';
  *                   type: string
  *                   description: Error message
  */
-export async function POST(request: NextRequest) {
+/*export async function POST(request: NextRequest) {
   const { title, description, type, author, status } = await request.json();
   console.log({ title, description, type, author, status }); // Log each field
 
@@ -80,6 +80,42 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     return NextResponse.json({ message: error }, { status: 400 });
+  }
+}*/
+
+export async function POST(request: NextRequest) {
+  try {
+      const { title, description, type, author } = await request.json();
+
+      if (!title || !description || !type || !author) {
+          return NextResponse.json(
+              { success: false, message: "All fields are required" },
+              { status: 400 }
+          );
+      }
+
+      await connectMongoDB();
+
+      const newContent = new Content({
+          title,
+          description,
+          type,
+          author,
+          status: "draft",
+      });
+
+      const savedContent = await newContent.save();
+
+      return NextResponse.json(
+          { message: "Content created successfully", content: savedContent },
+          { status: 201 }
+      );
+  } catch (error) {
+      console.error("Error creating content:", error);
+      return NextResponse.json(
+          { success: false, message: "Failed to create content" },
+          { status: 500 }
+      );
   }
 }
 

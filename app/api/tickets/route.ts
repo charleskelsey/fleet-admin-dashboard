@@ -65,7 +65,7 @@ interface UserUpdate {
  *                   type: string
  *                   description: Error message
  */
-export async function POST(request: NextRequest) {
+/*export async function POST(request: NextRequest) {
   const { subject, description, status, priority, assignedUser } = await request.json();
 
   try {
@@ -77,6 +77,42 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     return NextResponse.json({ message: error }, { status: 400 });
+  }
+}*/
+
+export async function POST(request: NextRequest) {
+  try {
+      const { subject, description, status = "assigned", priority = "low", assignedUser = "none" } = await request.json();
+
+      if (!subject || !description) {
+          return NextResponse.json(
+              { success: false, message: "Subject and description are required" },
+              { status: 400 }
+          );
+      }
+
+      await connectMongoDB();
+
+      const newTicket = new Ticket({
+          subject,
+          description,
+          status,
+          priority,
+          assignedUser,
+      });
+
+      const savedTicket = await newTicket.save();
+
+      return NextResponse.json(
+          { message: "Ticket created successfully", ticket: savedTicket },
+          { status: 201 }
+      );
+  } catch (error) {
+      console.error("Error creating ticket:", error);
+      return NextResponse.json(
+          { success: false, message: "Failed to create ticket" },
+          { status: 500 }
+      );
   }
 }
 

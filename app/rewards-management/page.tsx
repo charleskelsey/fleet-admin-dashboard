@@ -172,7 +172,7 @@ const RewardManagement = () => {
 
     return (
         <div className="h-screen flex items-center justify-center">
-            <main className="flex flex-col gap-6 w-full h-full pt-10 pb-10 px-12 border border-black">
+            <main className="flex flex-col gap-6 w-full h-full pt-10 pb-10 px-12 border-black">
                 <h1 className="font-bold text-4xl flex justify-center">
                     REWARD MANAGEMENT
                 </h1>

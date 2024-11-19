@@ -21,6 +21,7 @@ const contentSchema = new Schema(
     },
     status: {
       type: String,
+      default: 'draft',
       required: true,
     },
 
