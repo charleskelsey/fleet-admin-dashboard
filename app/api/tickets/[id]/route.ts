@@ -64,7 +64,7 @@ import { NextRequest, NextResponse } from "next/server";
  *                   type: string
  *                   example: Ticket not found or version mismatch
  */
-/*export async function PUT(request: NextRequest, context: { params: Promise<{ id: String }> }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: String }> }) {
   const { id } = await context.params;
 
   try {
@@ -97,39 +97,6 @@ import { NextRequest, NextResponse } from "next/server";
     return NextResponse.json(
       { success: false, message: error },
       { status: 409 });
-  }
-}*/
-
-export async function PUT(request: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
-  
-  try {
-      const { subject, description, status, priority, assignedUser } = await request.json();
-
-      await connectMongoDB();
-      const updatedTicket = await Ticket.findByIdAndUpdate(
-          id,
-          { subject, description, status, priority, assignedUser },
-          { new: true, runValidators: true }
-      );
-
-      if (!updatedTicket) {
-          return NextResponse.json(
-              { success: false, message: "Ticket not found or version mismatch" },
-              { status: 404 }
-          );
-      }
-
-      return NextResponse.json(
-          { success: true, message: "Ticket updated", ticket: updatedTicket },
-          { status: 200 }
-      );
-  } catch (error) {
-      console.error(error);
-      return NextResponse.json(
-          { success: false, message: "An unexpected error occurred" },
-          { status: 500 }
-      );
   }
 }
 
