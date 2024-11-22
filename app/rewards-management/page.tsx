@@ -39,8 +39,12 @@ const RewardManagement = () => {
                 }
                 const data = await res.json();
                 setRewards(data.rewards);
-            } catch (err: any) {
-                setError(err.message);
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError("An unexpected error occurred");
+                }
             } finally {
                 setLoading(false);
             }
@@ -56,13 +60,16 @@ const RewardManagement = () => {
             });
 
             if (res.ok) {
-                // Remove the deleted reward from the state
                 setRewards(rewards.filter(reward => reward._id !== id));
             } else {
                 throw new Error('Failed to delete the reward');
             }
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("An unexpected error occurred");
+            }
         }
     };
 
@@ -75,25 +82,23 @@ const RewardManagement = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    newStatus: newStatus, // Send only the new status
-                }),
+                body: JSON.stringify({ newStatus }),
             });
-
+    
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.message || 'Failed to update status');
             }
-
-            const data = await res.json();
-
-            // Update the status locally
+    
             setRewards(rewards.map(reward =>
                 reward._id === id ? { ...reward, status: newStatus } : reward
             ));
-        } catch (err: any) {
-            console.error("Error updating reward status:", err.message);
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("An unexpected error occurred");
+            }
         }
     };
 
@@ -105,22 +110,23 @@ const RewardManagement = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    newPointsRequired: newPoints, // Send the updated points
-                }),
+                body: JSON.stringify({ newPointsRequired: newPoints }),
             });
-
+    
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.message || 'Failed to update points');
             }
-
-            // Update points locally
+    
             setRewards(rewards.map(reward =>
                 reward._id === id ? { ...reward, pointsRequired: newPoints } : reward
             ));
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("An unexpected error occurred");
+            }
         }
     };
 
@@ -134,17 +140,15 @@ const RewardManagement = () => {
                 },
                 body: JSON.stringify(newReward),
             });
-
+    
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.message || 'Failed to create reward');
             }
-
+    
             const data = await res.json();
-            // Add the new reward to the state
             setRewards([...rewards, data.reward]);
-
-            // Clear the form
+    
             setNewReward({
                 _id: '',
                 name: '',
@@ -156,9 +160,12 @@ const RewardManagement = () => {
                 createdAt: '',
                 updatedAt: ''
             });
-
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("An unexpected error occurred");
+            }
         }
     };
 

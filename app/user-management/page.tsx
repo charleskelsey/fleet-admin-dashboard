@@ -1,8 +1,7 @@
 'use client'
-import Link from 'next/link';
-import React, { use, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-const userManagement = () => {
+const UserManagement = () => {
     interface User {
         _id: string;
         username: string;
@@ -33,8 +32,13 @@ const userManagement = () => {
                 }
                 const data = await res.json();
                 setUsers(data.users);
-            } catch (err: any) {
-                setError(err.message);
+            } catch (err: unknown) {
+                //setError(err.message);
+                if (err instanceof Error) {
+                    setError(err.message); // Access error properties safely
+                } else {
+                    setError("An unknown error occurred");
+                }
             } finally {
                 setLoading(false);
             }
@@ -55,14 +59,18 @@ const userManagement = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editUser),
             });
-
+        
             if (!res.ok) throw new Error('Failed to update user');
-
+        
             const updatedUser = await res.json();
             setUsers(users.map((user) => (user._id === updatedUser._id ? updatedUser : user)));
             setEditUser(null);
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("An unknown error occurred");
+            }
         }
     };
 
@@ -75,15 +83,17 @@ const userManagement = () => {
                 throw new Error('Failed to delete user');
             }
             setUsers(users.filter((user) => user._id !== id));
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("An unknown error occurred");
+            }
         }
     };
 
     const handleCreateUser = async () => {
         try {
-            const { password, ...userWithoutIds } = newUser;
-
             const res = await fetch(`/api/users`, {
                 method: 'POST',
                 headers: {
@@ -91,24 +101,28 @@ const userManagement = () => {
                 },
                 body: JSON.stringify(newUser),
             });
-
+        
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.message || 'Failed to create user');
             }
-
+        
             const data = await res.json();
             setUsers([...users, data.user]);
-
+        
             setNewUser({
                 username: '',
                 password: '',
                 email: '',
                 role: 'user',
             });
-
-        } catch (err: any) {
-            setError(err.message);
+        
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError("An unknown error occurred");
+            }
         }
     };
 
@@ -288,4 +302,4 @@ const userManagement = () => {
     )
 }
 
-export default userManagement
+export default UserManagement

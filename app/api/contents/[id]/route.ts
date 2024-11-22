@@ -68,7 +68,7 @@ import { NextRequest, NextResponse } from "next/server";
  *                   type: string
  *                   example: Content not found or version mismatch
  */
-export async function PUT(request: NextRequest, context: { params: Promise<{ id: String }> }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
   try {
@@ -163,7 +163,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
  *                   type: string
  *                   example: could not find content item
  */
-export async function GET(request: NextRequest, context: { params: Promise<{ id: String }> }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
   await connectMongoDB();

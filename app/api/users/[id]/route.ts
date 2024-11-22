@@ -75,7 +75,7 @@ import { NextRequest, NextResponse } from "next/server";
  *                   type: string
  *                   description: Error message
  */
-export async function PUT(request: NextRequest, context: { params: Promise<{ id: String }> }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
   try {
@@ -164,7 +164,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
  *                   description: Error message
  */
 // Read user by id
-export async function GET(request: NextRequest, context: { params: Promise<{ id: String }> }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
   await connectMongoDB();

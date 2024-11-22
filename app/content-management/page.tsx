@@ -1,8 +1,7 @@
 'use client'
-import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 
-const contentManagement = () => {
+const ContentManagement = () => {
     interface Content {
         _id: string;
         title: string;
@@ -37,8 +36,12 @@ const contentManagement = () => {
                 }
                 const data = await res.json();
                 setContents(data.content);
-            } catch (err: any) {
-                setError(err.message);
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError('An unknown error occurred');
+                }
             } finally {
                 setLoading(false);
             }
@@ -51,14 +54,18 @@ const contentManagement = () => {
             const res = await fetch(`/api/contents?id=${id}`, {
                 method: 'DELETE',
             });
-
+    
             if (res.ok) {
                 setContents(contents.filter(content => content._id !== id));
             } else {
-                throw new Error('Failed to delete the reward');
+                throw new Error('Failed to delete the content');
             }
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An unknown error occurred');
+            }
         }
     };
 
@@ -74,20 +81,25 @@ const contentManagement = () => {
                     newStatus: newStatus,
                 }),
             });
-
+    
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.message || 'Failed to update status');
             }
-
+    
             const data = await res.json();
-
+    
             setContents(contents.map(content =>
                 content._id === id ? { ...content, status: newStatus } : content
             ));
-        } catch (err: any) {
-            console.error("Error updating content status:", err.message);
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                console.error("Error updating content status:", err.message);
+                setError(err.message);
+            } else {
+                console.error("An unknown error occurred while updating status.");
+                setError('An unknown error occurred');
+            }
         }
     };
 
@@ -127,8 +139,12 @@ const contentManagement = () => {
                 createdAt: '',
                 updatedAt: '',
             });
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message);
+            } else {
+                setError('An unknown error occurred');
+            }
         }
     };
 
@@ -243,4 +259,4 @@ const contentManagement = () => {
     )
 }
 
-export default contentManagement;
+export default ContentManagement;

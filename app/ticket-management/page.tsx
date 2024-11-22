@@ -1,8 +1,7 @@
 'use client'
-import Link from 'next/link';
-import React, { use, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-const ticketManagement = () => {
+const TicketManagement = () => {
     interface Ticket {
         _id: string;
         subject: string;
@@ -39,8 +38,13 @@ const ticketManagement = () => {
                 }
                 const data = await res.json();
                 setTickets(data.tickets);
-            } catch (err: any) {
-                setError(err.message);
+            } catch (err: unknown) {
+                //setError(err.message);
+                if (err instanceof Error) {
+                    setError(err.message); // Access error properties safely
+                } else {
+                    setError("An unknown error occurred");
+                }
             } finally {
                 setLoading(false);
             }
@@ -81,8 +85,13 @@ const ticketManagement = () => {
                 setTickets(updatedTickets);
                 setEditingTicket(null);
                 setEditForm(null);
-            } catch (err: any) {
-                setError(err.message);
+            } catch (err: unknown) {
+                //setError(err.message);
+                if (err instanceof Error) {
+                    setError(err.message); // Access error properties safely
+                } else {
+                    setError("An unknown error occurred");
+                }
             }
         }
     };
@@ -103,8 +112,13 @@ const ticketManagement = () => {
             } else {
                 throw new Error('Failed to delete the ticket');
             }
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            //setError(err.message);
+            if (err instanceof Error) {
+                setError(err.message); // Access error properties safely
+            } else {
+                setError("An unknown error occurred");
+            }
         }
     };
 
@@ -138,8 +152,13 @@ const ticketManagement = () => {
                 updatedAt: ''
             });
 
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            //setError(err.message);
+            if (err instanceof Error) {
+                setError(err.message); // Access error properties safely
+            } else {
+                setError("An unknown error occurred");
+            }
         }
     };
 
@@ -344,4 +363,4 @@ const ticketManagement = () => {
     )
 }
 
-export default ticketManagement
+export default TicketManagement

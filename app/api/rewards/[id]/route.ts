@@ -68,6 +68,17 @@ import { NextRequest, NextResponse } from "next/server";
  *                   type: string
  *                   example: Reward not found or version mismatch
  */
+
+// Define a type for the fields that can be updated
+type UpdateFields = {
+  name?: string;
+  description?: string;
+  pointsRequired?: number;
+  status?: string;
+  category?: string;
+  expirationDate?: string;
+};
+
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
@@ -76,7 +87,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     const { newName, newDescription, newPointsRequired, newStatus, newCategory, newExpirationDate } = await request.json();
 
     // Prepare an object with the fields that need to be updated
-    const updateFields: any = {};
+    const updateFields: UpdateFields = {};
 
     if (newName) updateFields.name = newName;
     if (newDescription) updateFields.description = newDescription;
@@ -174,7 +185,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
  *                   type: string
  *                   example: could not find reward
  */
-export async function GET(request: NextRequest, context: { params: Promise<{ id: String }> }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
   await connectMongoDB();
