@@ -63,20 +63,21 @@ interface UserUpdate {
  *                   type: string
  *                   description: Error message
  */
+
 export async function POST(request: NextRequest) {
   try {
-    const { username, password, email, role } = await request.json();
+    const { username, email, password, role } = await request.json();
 
-    if (!username || !password || !email || !role) {
+    if (!username || !email || !password || !role) {
       return NextResponse.json(
-        { success: false, message: "All fields are required" },
+        { success: false, message: "Missing required fields" },
         { status: 400 }
       );
     }
 
     await connectMongoDB();
 
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
         { success: false, message: "User already exists" },
@@ -84,17 +85,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+
     const newUser = new User({
       username,
-      password,
       email,
+      password,
       role,
     });
 
-    const savedUser = await newUser.save();
+    await newUser.save();
 
     return NextResponse.json(
-      { success: true, message: "User created successfully", user: savedUser },
+      { success: true, user: newUser },
       { status: 201 }
     );
   } catch (error) {
@@ -105,6 +107,10 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+
+
+
 
 /**
  * @swagger
@@ -166,11 +172,12 @@ export async function GET() {
     await connectMongoDB();
 
     const users = await User.find();
-    if (users)
-      return NextResponse.json({ users }, { status: 200 });
-    
+    return NextResponse.json({ users }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: error }, { status: 400 });
+    return NextResponse.json(
+      { message: (error instanceof Error ? error.message : "Failed to fetch users") },
+      { status: 400 }
+    );
   }
 }
 
@@ -225,11 +232,69 @@ export async function DELETE(request: NextRequest) {
   const id = request.nextUrl.searchParams.get("id");
 
   try {
+    if (!id) {
+      return NextResponse.json(
+        { message: "Missing user ID" },
+        { status: 400 }
+      );
+    }
+
     await connectMongoDB();
-    await User.findByIdAndDelete(id);
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ message: "User Deleted" }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: error }, { status: 400 });
+    return NextResponse.json(
+      { message: (error instanceof Error ? error.message : "Failed to delete user") },
+      { status: 400 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  const id = request.nextUrl.searchParams.get("id");
+  const { newUsername, newEmail } = await request.json();
+
+  if (!id || !newUsername || !newEmail) {
+    return NextResponse.json(
+      { success: false, message: "Missing required fields" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await connectMongoDB();
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    user.username = newUsername || user.username;
+    user.email = newEmail || user.email;
+
+    await user.save();
+
+    return NextResponse.json(
+      { success: true, user },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return NextResponse.json(
+      { success: false, message: (error instanceof Error ? error.message : "Failed to update user") },
+      { status: 500 }
+    );
   }
 }

@@ -33,9 +33,8 @@ const UserManagement = () => {
                 const data = await res.json();
                 setUsers(data.users);
             } catch (err: unknown) {
-                //setError(err.message);
                 if (err instanceof Error) {
-                    setError(err.message); // Access error properties safely
+                    setError(err.message); 
                 } else {
                     setError("An unknown error occurred");
                 }
@@ -50,29 +49,7 @@ const UserManagement = () => {
         setEditUser(user);
     };
 
-    const handleUpdate = async () => {
-        if (!editUser) return;
 
-        try {
-            const res = await fetch(`/api/users?id=${editUser._id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(editUser),
-            });
-        
-            if (!res.ok) throw new Error('Failed to update user');
-        
-            const updatedUser = await res.json();
-            setUsers(users.map((user) => (user._id === updatedUser._id ? updatedUser : user)));
-            setEditUser(null);
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message);
-            } else {
-                setError("An unknown error occurred");
-            }
-        }
-    };
 
     const handleDelete = async (id: string) => {
         try {
@@ -91,40 +68,90 @@ const UserManagement = () => {
             }
         }
     };
-
-    const handleCreateUser = async () => {
+    
+    
+    
+    const handleEditClick = (user: User) => {
+        setEditUser(user);  
+    };
+    
+    const handleUpdate = async () => {
+        if (!editUser?.username || !editUser?.email || !editUser?.role) {
+            alert("All fields must be filled out");
+            return;
+        }
         try {
-            const res = await fetch(`/api/users`, {
-                method: 'POST',
+            const response = await fetch(`/api/users?id=${editUser._id}`, {
+                method: "PUT",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(newUser),
+                body: JSON.stringify({
+                    newUsername: editUser.username,
+                    newEmail: editUser.email,
+                    newRole: editUser.role,
+                }),
             });
-        
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.message || 'Failed to create user');
-            }
-        
-            const data = await res.json();
-            setUsers([...users, data.user]);
-        
-            setNewUser({
-                username: '',
-                password: '',
-                email: '',
-                role: 'user',
-            });
-        
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message);
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert("User updated successfully");
+                setUsers(users.map(user => user._id === editUser._id ? { ...user, ...editUser } : user));
             } else {
-                setError("An unknown error occurred");
+                alert(data.message || "Error updating user");
             }
+        } catch (error) {
+            console.error("Error updating user:", error);
+            alert("An error occurred while updating the user.");
         }
     };
+      
+    
+
+
+
+      const handleCreateUser = async () => {
+        try {
+          const res = await fetch(`/api/users`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newUser),
+          });
+      
+          const rawResponse = await res.text(); 
+          console.log("Raw response:", rawResponse); 
+      
+          if (!res.ok) {
+            const data = rawResponse ? JSON.parse(rawResponse) : { message: 'Failed to create user' };
+            throw new Error(data.message || 'Failed to create user');
+          }
+      
+          const data = JSON.parse(rawResponse);
+      
+          if (data.success) {
+            setUsers([...users, data.user]);
+            setNewUser({
+              username: '',
+              password: '',
+              email: '',
+              role: 'user',
+            });
+            alert("User created successfully");
+          } else {
+            alert(data.message || "Error creating user");
+          }
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError("An unknown error occurred");
+          }
+        }
+      };
+      
 
     if (loading) {
         return <p>Loading...</p>;
